@@ -5,14 +5,13 @@ import net.engineeringdigest.journalApp.repository.JournalEntryRepo;
 import net.engineeringdigest.journalApp.service.JournalEntryService;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @RestController
 @RequestMapping("/_journal")
@@ -28,8 +27,12 @@ public class JournalEntryControllerV2 {
 
 
     @GetMapping("/all/{myId}")
-    public JournalEntry getEntry(@PathVariable ObjectId myId) {
-        return journalEntryService.findById(myId).orElse(null);
+    public ResponseEntity<?> getEntry(@PathVariable ObjectId myId) {
+        Optional<JournalEntry> response = journalEntryService.findById(myId);
+        if(response.isPresent()){
+            return new ResponseEntity<>(response.get(), HttpStatus.OK);
+        }
+        return new ResponseEntity<>("not found",HttpStatus.NOT_FOUND);
     }
 
     @PostMapping("/add")
